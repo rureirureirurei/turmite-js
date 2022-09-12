@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.js"></script>
+    <script src="./turmite.js"></script>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  
+  <body>
+    <div style="text-align:center" class="heading"> 
+        Turmite Demo
+    </div>
+
+    <div class="container">
+      <div class="turmite-grid-block"> 
+        <div id="p5canvas" class="turmite-grid"> </div>
+      </div>
+
+      <div class="turmite-input-block">
+          <textarea class="turmite-input" rows="16" cols="15">A 5 B 5 2</textarea>
+          <div class="submit-button-block">
+            <button onclick="redrawTurmite()" class="submit-button"> Let's go! </button>
+          </div>
+      </div>
+
+      </div>
+    </div>
+  </body>
+
+</html>
