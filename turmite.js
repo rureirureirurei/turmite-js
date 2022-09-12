@@ -1,5 +1,5 @@
-var WIDTH = 600;
-var HEIGHT = 600;
+var WIDTH = 800;
+var HEIGHT = 800;
 var ROWS = 200;
 var COLUMNS = 200;
 
@@ -8,7 +8,7 @@ var COLOURS = [
 ]
 
 function setup() {  
-  createCanvas(WIDTH + 2, HEIGHT + 2).parent("p5canvas");
+  canvas = createCanvas(WIDTH + 2, HEIGHT + 2).parent("p5canvas");
   noLoop();
 }
 
@@ -116,8 +116,12 @@ function redrawTurmite() {
 
   var grid = create2dArray(ROWS, COLUMNS, 0);
 
-  while (positionValid(turmite)) {
+  var CNT = 0;
+  let CNT_MAX = 200000;
+  
+  while (positionValid(turmite) & CNT < CNT_MAX) {
     nextPosition();
+    CNT += 1;
   }
 
 }
