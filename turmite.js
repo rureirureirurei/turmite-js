@@ -1,10 +1,15 @@
-var WIDTH = 800;
-var HEIGHT = 800;
+var WIDTH = 600;
+var HEIGHT = 600;
 var ROWS = 200;
 var COLUMNS = 200;
 
-var COLOURS = [
-  {}
+var PALETTE = [
+  '#FFFFFF', '#000000', '#FF33FF', '#FFFF99', '#00B3E6', 
+  '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+  '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', 
+  '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+  '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', 
+  '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399'
 ]
 
 function setup() {  
@@ -66,6 +71,15 @@ function redrawTurmite() {
     return 1;
   }
 
+  function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  }
+
   function nextPosition() {
     if (positionValid(turmite) == 0) {
       return;
@@ -74,7 +88,7 @@ function redrawTurmite() {
       if (turmite.state == rule[0] && grid[turmite.x][turmite.y] == rule[1]) {
         turmite.state = rule[2];
         grid[turmite.x][turmite.y] = rule[3];
-        drawCell(turmite.x, turmite.y, {r:255 - rule[3] * 255,g:255 - rule[3] * 255,b:255 - rule[3] * 255});
+        drawCell(turmite.x, turmite.y, hexToRgb(PALETTE[rule[3]]));
         updateDirection(rule[4]);
         moveInDirection();
         return;
