@@ -23,12 +23,9 @@ function draw() {
 }
 
 function drawCell(i, j, colour) {
-  if (i < 0 | j < 0 | i >= ROWS | j >= COLUMNS) {
-    return;
-  }
   tile_width = WIDTH / COLUMNS;
   tile_height = HEIGHT / ROWS;
-  fill(colour.r, colour.g, colour.b);
+  fill(colour);
   noStroke();
   rect(1 + j * tile_width, 1 + i * tile_height, tile_width, tile_height, 0);
   
@@ -44,27 +41,31 @@ function resetGrid() {
 }
 
 class Turmite {
-  constructor(x, y, state, direction) {
-    this.x = x;
-    this.y = y;
-    this.state = state;
-    this.direction = direction;
+  constructor(x, y, state, direction, rules) {
+    this._x = x;
+    this._y = y;
+    this._state = state;
+    this._direction = direction;
+    this._rules = rules;
   }
 
   get state() {
-    return this.state;
+    return this._state;
   }
   get direction() {
-    return this.direction;
+    return this._direction;
   }
   get x() {
-    return this.x;
+    return this._x;
   }
   get y() {
-    return this.y;
+    return this._y;
+  }
+  get rules() {
+    return this._rules;
   }
 
-  function moveForward() {
+  moveForward() {
     var coords = {
       'D' : {x: 1, y: 0},
       'U' : {x: -1, y: 0},
@@ -72,12 +73,12 @@ class Turmite {
       'R' : {x: 0, y: 1},
     };
 
-    var newX = this.x + coords[turmite.direction].x;
-    var newY = this.y + coords[turmite.direction].y;
+    var newX = this.x + coords[this.direction].x;
+    var newY = this.y + coords[this.direction].y;
     
     if (positionValid(newX, newY)) {
-      this.x = newX;
-      this.y = newY;
+      this._x = newX;
+      this._y = newY;
     }
 
     function positionValid(x, y) {
@@ -88,7 +89,7 @@ class Turmite {
     }
   }
 
-  function changeDirection(turn) {
+  changeDirection(turn) {
     var directionOrder = 'LURD';
     var turnOffsets = {'L' : -1, 'N' : 0, 'R' : 1, 'U' : 2};
     var directionsCount = 4;
@@ -96,7 +97,25 @@ class Turmite {
     var currentDirectionIndex = directionOrder.indexOf(this.direction);
     var offsetDirectionIndex = currentDirectionIndex + turnOffset;
     var wrappedDirectionIndex = (offsetDirectionIndex + directionsCount) % directionsCount;
-    this.direction = directionOrder[wrappedDirectionIndex];
+    this._direction = directionOrder[wrappedDirectionIndex];
+  }
+
+  step(grid) {
+    for (let rule of this.rules) {
+      var currentState = rule[0];
+      var currentColour = rule[1];
+      var newState = rule[2];
+      var newColour = rule[3];
+      var turnDirection = rule[4];
+      var tileColour = grid[this.x][this.y];
+
+      if (this.state == currentState && tileColour == currentColour) {
+        this._state = newState;
+        this.changeDirection(turnDirection);
+        this.moveForward();
+        grid[this.x][this.y] = newColour;
+      }
+    }
   }
 }
 
@@ -105,6 +124,24 @@ function redrawTurmite() {
   resetGrid();
 
   var rules = document.getElementById("turmite-input").value.split('\n').map(obj => obj.trim().split(' '));
+
+  var grid = create2dArray(ROWS, COLUMNS, 0);
+
+  var iter = 0;
+  var ITER_MAX = 10;
+  
+  var turmite = new Turmite(ROWS / 2, COLUMNS / 2, 'A', 'L', rules);
+
+  while (iter < ITER_MAX) {
+    var oldX = turmite.x;
+    var oldY = turmite.y;
+    turmite.step(grid);
+
+    drawCell(oldX, oldY, color(PALETTE[grid[oldX][oldY]]));
+    color(PALETTE[grid[oldX][oldY]]);
+    
+    iter += 1;
+  }
 
   
   function create2dArray(rows, columns, initialValue) {
@@ -118,30 +155,4 @@ function redrawTurmite() {
     }
     return matrix;
   }
-
-  function nextPosition() {
-    for (let rule of rules) {
-      if (turmite.state == rule[0] && grid[turmite.x][turmite.y] == rule[1]) {
-        turmite.state = rule[2];
-        grid[turmite.x][turmite.y] = rule[3];
-        drawCell(turmite.x, turmite.y, color(PALETTE[rule[3]]));
-        updateDirection(rule[4]);
-        moveInDirection();
-        return;
-      }
-    }
-  }
-
-  var grid = create2dArray(ROWS, COLUMNS, 0);
-
-  var iter = 0;
-  var ITER_MAX = 200000;
-  
-  var turmite = new Turmite(ROWS / 2, COLUMNS / 2, 'A', 'L');
-
-  while (positionValid(turmite) & iter < ITER_MAX) {
-    nextPosition();
-    iter += 1;
-  }
-
 }
