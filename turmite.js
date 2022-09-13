@@ -43,52 +43,88 @@ function resetGrid() {
   }
 }
 
+class Turmite {
+  constructor(x, y, state, direction) {
+    this.x = x;
+    this.y = y;
+    this.state = state;
+    this.direction = direction;
+  }
+
+  get state() {
+    return this.state;
+  }
+  get direction() {
+    return this.direction;
+  }
+  get x() {
+    return this.x;
+  }
+  get y() {
+    return this.y;
+  }
+
+  function moveForward() {
+    var coords = {
+      'D' : {x: 1, y: 0},
+      'U' : {x: -1, y: 0},
+      'L' : {x: 0, y: -1},
+      'R' : {x: 0, y: 1},
+    };
+
+    var newX = this.x + coords[turmite.direction].x;
+    var newY = this.y + coords[turmite.direction].y;
+    
+    if (positionValid(newX, newY)) {
+      this.x = newX;
+      this.y = newY;
+    }
+
+    function positionValid(x, y) {
+      if (x < 0 || y < 0 || x >= ROWS || y >= COLUMNS) {
+        return 0;
+      } 
+      return 1;
+    }
+  }
+
+  function changeDirection(turn) {
+    var directionOrder = 'LURD';
+    var turnOffsets = {'L' : -1, 'N' : 0, 'R' : 1, 'U' : 2};
+    var directionsCount = 4;
+    var turnOffset = turnOffsets[turn];
+    var currentDirectionIndex = directionOrder.indexOf(this.direction);
+    var offsetDirectionIndex = currentDirectionIndex + turnOffset;
+    var wrappedDirectionIndex = (offsetDirectionIndex + directionsCount) % directionsCount;
+    this.direction = directionOrder[wrappedDirectionIndex];
+  }
+}
+
+
 function redrawTurmite() {
   resetGrid();
 
   var rules = document.getElementById("turmite-input").value.split('\n').map(obj => obj.trim().split(' '));
 
-  var turmite = {x: ROWS / 2, y: COLUMNS / 2, orientation: 'L', state: 'A'};
   
-  function create2dArray(rows, columns, initial_value) {
-    var i;
-    var matrix = new Array(rows);
+  function create2dArray(rows, columns, initialValue) {
+    var i, j;
+    var matrix = [];
     for (i = 0; i < rows; i += 1) {
-      matrix[i] = new Array(columns);
+      matrix[i] = [];
       for (j = 0; j < columns; j += 1) {
-        matrix[i][j] = initial_value;
+        matrix[i][j] = initialValue;
       }
     }
     return matrix;
   }
 
-  function positionValid(turmite) {
-    let x = turmite.x;
-    let y = turmite.y;
-    if (x < 0 | y < 0 | x >= ROWS | y >= COLUMNS) {
-      return 0;
-    } 
-    return 1;
-  }
-
-  function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : null;
-  }
-
   function nextPosition() {
-    if (positionValid(turmite) == 0) {
-      return;
-    } 
     for (let rule of rules) {
       if (turmite.state == rule[0] && grid[turmite.x][turmite.y] == rule[1]) {
         turmite.state = rule[2];
         grid[turmite.x][turmite.y] = rule[3];
-        drawCell(turmite.x, turmite.y, hexToRgb(PALETTE[rule[3]]));
+        drawCell(turmite.x, turmite.y, color(PALETTE[rule[3]]));
         updateDirection(rule[4]);
         moveInDirection();
         return;
@@ -96,46 +132,16 @@ function redrawTurmite() {
     }
   }
 
-  function moveInDirection() {
-    coords = {
-      'D' : {x: 1, y: 0},
-      'U' : {x: -1, y: 0},
-      'L' : {x: 0, y: -1},
-      'R' : {x: 0, y: 1},
-    };
-    turmite.x += coords[turmite.orientation].x;
-    turmite.y += coords[turmite.orientation].y;
-  }
-
-  function updateDirection(turn) {
-
-    if (turn == 'R') {
-      turnRight();
-    }
-    if (turn == 'L') {
-      turnRight();
-      turnRight();
-      turnRight();
-    } 
-    if (turn == 'U') {
-      turnRight();
-      turnRight();
-    }
-
-    function turnRight() {
-      let turnedOrientation = {'U' : 'R', 'R' : 'D', 'D' : 'L', 'L' : 'U'};
-      turmite.orientation = turnedOrientation[turmite.orientation];
-    }
-  }
-
   var grid = create2dArray(ROWS, COLUMNS, 0);
 
-  var CNT = 0;
-  let CNT_MAX = 200000;
+  var iter = 0;
+  var ITER_MAX = 200000;
   
-  while (positionValid(turmite) & CNT < CNT_MAX) {
+  var turmite = new Turmite(ROWS / 2, COLUMNS / 2, 'A', 'L');
+
+  while (positionValid(turmite) & iter < ITER_MAX) {
     nextPosition();
-    CNT += 1;
+    iter += 1;
   }
 
 }
