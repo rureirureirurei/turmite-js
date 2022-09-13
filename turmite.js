@@ -28,14 +28,13 @@ function drawCell(i, j, colour) {
   fill(colour);
   noStroke();
   rect(1 + j * tile_width, 1 + i * tile_height, tile_width, tile_height, 0);
-  
 }
 
 function resetGrid() {
   var i, j;
   for (i = 0; i < ROWS; i += 1) {
     for (j = 0; j < COLUMNS; j += 1) {
-      drawCell(i, j, {r: 255, g:255, b:255});
+      drawCell(i, j, 'white');
     }
   }
 }
@@ -79,6 +78,8 @@ class Turmite {
     if (positionValid(newX, newY)) {
       this._x = newX;
       this._y = newY;
+    } else {
+      return 0;
     }
 
     function positionValid(x, y) {
@@ -87,6 +88,7 @@ class Turmite {
       } 
       return 1;
     }
+    return 1;
   }
 
   changeDirection(turn) {
@@ -110,40 +112,39 @@ class Turmite {
       var tileColour = grid[this.x][this.y];
 
       if (this.state == currentState && tileColour == currentColour) {
+        grid[this.x][this.y] = newColour;
+        
         this._state = newState;
         this.changeDirection(turnDirection);
-        this.moveForward();
-        grid[this.x][this.y] = newColour;
+        if (!this.moveForward()) {
+          return 0;
+        }
       }
     }
+    return 1;
   }
 }
 
 
 function redrawTurmite() {
   resetGrid();
-
   var rules = document.getElementById("turmite-input").value.split('\n').map(obj => obj.trim().split(' '));
 
   var grid = create2dArray(ROWS, COLUMNS, 0);
-
   var iter = 0;
-  var ITER_MAX = 10;
-  
+  var ITER_MAX = 100000;
   var turmite = new Turmite(ROWS / 2, COLUMNS / 2, 'A', 'L', rules);
 
   while (iter < ITER_MAX) {
     var oldX = turmite.x;
     var oldY = turmite.y;
-    turmite.step(grid);
-
-    drawCell(oldX, oldY, color(PALETTE[grid[oldX][oldY]]));
-    color(PALETTE[grid[oldX][oldY]]);
-    
+    if (!turmite.step(grid)) {
+      break;
+    }
+    drawCell(oldX, oldY, PALETTE[grid[oldX][oldY]]);
     iter += 1;
   }
 
-  
   function create2dArray(rows, columns, initialValue) {
     var i, j;
     var matrix = [];
