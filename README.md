@@ -1,18 +1,18 @@
-## What's a turmite?
-A turmite is a Turing machine that has an orientation in addition to a current state and an infinite two-dimensional grid of cells.
+## Definition of a turmite
+A turmite is a type of Turing machine that possesses both an orientation and an infinite two-dimensional grid of cells in addition to its current state. 
 
-Based on a prewritten set of rules, turmite colors the tiles of a grid, which gives us an amazing result!
+By following a set of predetermined rules, a turmite can color the tiles of a grid to produce intricate and visually striking patterns.
 
 ## Usage 
-Type in an instructions and press the **Let's go** button. That's it!
+To use the turmite, simply input your instructions and press the **Let's go** button.
+
 
 ## Syntax
-Each input line should contain five symbols that define the current state and tile color, updated state, and new tile color with direction correspondingly.
+In terms of syntax, each input line should consist of five symbols that represent the current state and color of the tile, the updated state, the new color of the tile, and the direction of movement for the turmite. 
 
-For example, line **A 0 B 1 R** means that if the current state is **A** and the color of a tile underneath is **0** then the next state will be **B** with the tile recolored in **1**. Then the turmite will move rightwards (relatively to his previous direction).
+For example, the line **A 0 B 1 R** indicates that if the current state is **A** and the tile underneath is colored **0**, the next state will be **B** with the tile recolored to **1**. The turmite will then move rightward relative to its previous direction.
 
-
-## Some cool patterns I got
+## Observations of visually interesting patterns produced through the use of the turmite
 ![myCanvas-2](https://user-images.githubusercontent.com/78561567/189704320-3faba620-e213-4f45-b2d4-f9025773a0b2.jpg)
 ![myCanvas-3](https://user-images.githubusercontent.com/78561567/189704327-02bfa232-9a0c-4996-b5b3-edf29faa3d72.jpg)
 ![myCanvas-4](https://user-images.githubusercontent.com/78561567/189704332-0ff635d0-bc05-46de-8960-a52ed637212f.jpg)
